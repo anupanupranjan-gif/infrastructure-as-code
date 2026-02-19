@@ -1,0 +1,28 @@
+- name: Install Docker on Fedora
+  hosts: local
+  become: yes
+  tasks:
+    - name: Install required packages
+      dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - dnf-plugins-core
+        - device-mapper-persistent-data
+        - lvm2
+
+    - name: Add Docker repository
+      command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker
+      dnf:
+        name: docker-ce
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
